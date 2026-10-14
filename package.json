@@ -1,7 +1,7 @@
 {
   "name": "antigravity-zh-cn",
-  "version": "1.0.0",
-  "description": "Google Antigravity 桌面应用简体中文汉化补丁",
+  "version": "1.1.0",
+  "description": "Google Antigravity 桌面应用简体中文汉化补丁 (0依赖、一键安装、全界面汉化)",
   "keywords": [
     "antigravity",
     "google",
@@ -15,14 +15,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/veld-kn/antigravity-zh-cn.git"
   },
   "scripts": {
-    "apply": "node tools/apply-patches.js",
-    "install-patch": "node tools/apply-patches.js && scripts/install.bat",
+    "build": "node tools/apply-patches.js",
+    "install-patch": "node tools/apply-patches.js --install",
     "restore": "scripts/restore.bat"
   },
-  "dependencies": {
+  "devDependencies": {
     "@electron/asar": "^3.2.0"
   }
 }

@@ -1,11 +1,11 @@
 /**
- * Antigravity 自动化汉化补丁应用工具
- * 自动提取 app.asar，注入 zh-cn-translate.js 与原生汉化补丁，并重新打包
+ * Antigravity 自动化汉化补丁应用工具 (零依赖纯 JS 版)
+ * 内置 asar 打包/解包引擎，无需安装 npx 或外部依赖，支持直接使用 Antigravity 内置 Node 运行
  */
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const asar = require('./asar.js');
 
 function getAntigravityAsarPath() {
   if (process.env.LOCALAPPDATA) {
@@ -15,21 +15,20 @@ function getAntigravityAsarPath() {
   return null;
 }
 
-function runCommand(cmd, cwd) {
-  console.log(`> ${cmd}`);
-  execSync(cmd, { cwd: cwd || process.cwd(), stdio: 'inherit' });
-}
-
 async function main() {
-  const asarPath = process.argv[2] || getAntigravityAsarPath();
+  const args = process.argv.slice(2);
+  const isInstallMode = args.includes('--install');
+  const customPathArg = args.find(a => !a.startsWith('--'));
+
+  const asarPath = customPathArg || getAntigravityAsarPath();
 
   if (!asarPath || !fs.existsSync(asarPath)) {
     console.error('错误: 未找到 app.asar，请传入 app.asar 的完整路径。');
-    console.error('用法: node tools/apply-patches.js "<path-to-app.asar>"');
+    console.error('用法: node tools/apply-patches.js ["<path-to-app.asar>"] [--install]');
     process.exit(1);
   }
 
-  console.log(`找到目标 asar: ${asarPath}`);
+  console.log(`[1/6] 找到目标 asar: ${asarPath}`);
   const workDir = path.resolve(__dirname, '..', 'build_temp');
   const extractedDir = path.join(workDir, 'app_extracted');
   const distDir = path.join(extractedDir, 'dist');
@@ -41,13 +40,13 @@ async function main() {
   fs.mkdirSync(workDir, { recursive: true });
 
   // 1. 解包
-  console.log('正在解包 app.asar...');
-  runCommand(`npx asar extract "${asarPath}" "${extractedDir}"`);
+  console.log('[2/6] 正在解包 app.asar...');
+  asar.extractAll(asarPath, extractedDir);
 
   // 2. 复制 zh-cn-translate.js
   const srcScript = path.resolve(__dirname, '..', 'src', 'zh-cn-translate.js');
   const destScript = path.join(distDir, 'zh-cn-translate.js');
-  console.log(`复制翻译核心: ${srcScript} -> ${destScript}`);
+  console.log(`[3/6] 注入翻译核心引擎: zh-cn-translate.js`);
   fs.copyFileSync(srcScript, destScript);
 
   // 3. 注入 preload.js
@@ -74,7 +73,7 @@ try {
 `;
       content = content.replace('const updaterAPI = {', injection + 'const updaterAPI = {');
       fs.writeFileSync(preloadPath, content, 'utf-8');
-      console.log('已注入 preload.js');
+      console.log('      已注入 preload.js (页面预加载阶段)');
     }
   }
 
@@ -107,11 +106,12 @@ try {
       content = content.replace("void applyStoredZoomLevel();", "void applyStoredZoomLevel();" + injectFinishLoad);
       content = content.replace("win.webContents.on('dom-ready', () => {", "win.webContents.on('dom-ready', () => {" + injectDomReady);
       fs.writeFileSync(utilsPath, content, 'utf-8');
-      console.log('已注入 utils.js');
+      console.log('      已注入 utils.js (双重加载生命周期)');
     }
   }
 
   // 5. 替换原生文本 (main.js, menu.js, tray.js, updater.js, provisionSplash.js)
+  console.log('[4/6] 注入原生组件汉化补丁...');
   const replaceInFile = (file, map) => {
     const filePath = path.join(distDir, file);
     if (!fs.existsSync(filePath)) return;
@@ -120,7 +120,7 @@ try {
       content = content.split(from).join(to);
     }
     fs.writeFileSync(filePath, content, 'utf-8');
-    console.log(`已汉化原生组件: ${file}`);
+    console.log(`      已汉化原生模块: ${file}`);
   };
 
   replaceInFile('main.js', {
@@ -148,7 +148,7 @@ try {
     const trayNew = `countItem.label =\n                (count > 0 ? \`\${count} 个智能体运行中\` : '无智能体运行');`;
     content = content.replace(trayOld, trayNew);
     fs.writeFileSync(trayPath, content, 'utf-8');
-    console.log('已汉化原生组件: tray.js');
+    console.log('      已汉化原生模块: tray.js');
   }
 
   replaceInFile('updater.js', {
@@ -166,13 +166,40 @@ try {
   });
 
   // 6. 重新打包
-  const outputAsar = path.resolve(__dirname, '..', 'app_zh.asar');
-  console.log(`正在打包新 asar: ${outputAsar}...`);
-  runCommand(`npx asar pack "${extractedDir}" "${outputAsar}"`);
+  const outputAsar = isInstallMode
+    ? path.resolve(__dirname, '..', 'build_temp', 'app_zh_temp.asar')
+    : path.resolve(__dirname, '..', 'app_zh.asar');
+
+  console.log(`[5/6] 正在重新打包 asar...`);
+  await asar.createPackage(extractedDir, outputAsar);
+  await new Promise(r => setTimeout(r, 200));
+
+  const stats = fs.statSync(outputAsar);
+  console.log(`      打包完成！大小: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
+
+  if (isInstallMode) {
+    console.log(`[6/6] 正在安装到 Antigravity: ${asarPath}...`);
+    // 备份原文件 (若尚未备份)
+    const backupPath = asarPath + '.backup';
+    if (!fs.existsSync(backupPath)) {
+      console.log(`      备份原版文件 -> ${backupPath}`);
+      fs.copyFileSync(asarPath, backupPath);
+    }
+    // 替换为汉化包
+    fs.copyFileSync(outputAsar, asarPath);
+    console.log(`      替换成功！补丁已安装到应用。`);
+
+    // 清理临时目录
+    try {
+      fs.rmSync(workDir, { recursive: true, force: true });
+    } catch (_) {}
+  } else {
+    // 产生根目录下的 app_zh.asar 方便独立分发
+    console.log(`[6/6] 汉化包生成完毕: ${outputAsar}`);
+  }
 
   console.log('\n========================================');
-  console.log('汉化打包完成！生成文件: ' + outputAsar);
-  console.log('请运行 scripts/install.bat 将补丁应用到 Antigravity 中。');
+  console.log('✓ 汉化处理完成！');
   console.log('========================================');
 }
 
