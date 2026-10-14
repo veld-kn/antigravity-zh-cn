@@ -1,0 +1,5 @@
+--- provisionSplash.js
++++ provisionSplash.js
+@@ -76,3 +76,3 @@
+-        status: `Setting up WSL: ${distro}`,
++        status: `正在配置 WSL: ${distro}`,

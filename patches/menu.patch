@@ -1,0 +1,14 @@
+--- menu.js
++++ menu.js
+@@ -55,3 +55,3 @@
+-        label: 'New Window',
++        label: '新建窗口',
+@@ -77,3 +77,3 @@
+-        label: 'Docs',
++        label: '文档',
+@@ -127,3 +127,3 @@
+-    return { label: 'Connect to WSL', submenu };
++    return { label: '连接到 WSL', submenu };
+@@ -134,3 +134,3 @@
+-    return { label: 'Reopen Locally', click: () => relaunchWithWslDistro('') };
++    return { label: '在本地重新打开', click: () => relaunchWithWslDistro('') };

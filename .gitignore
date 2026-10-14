@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+*.asar
+app_extracted/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+install_log.txt
+
+# Backup files
+*.backup
+*.bak
+
+# Environment
+.env
+.env.local

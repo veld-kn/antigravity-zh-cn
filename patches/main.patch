@@ -1,0 +1,26 @@
+--- main.js
++++ main.js
+@@ -346,3 +346,3 @@
+-                    label: 'New Window',
++                    label: '新建窗口',
+@@ -355,3 +355,3 @@
+-                label: 'No agents running',
++                label: '无智能体运行',
+@@ -360,3 +360,3 @@
+-                label: `Open ${electron_1.app.getName()}`,
++                label: `打开 ${electron_1.app.getName()}`,
+@@ -364,3 +364,3 @@
+-                label: 'Quit',
++                label: '退出',
+@@ -462,7 +462,7 @@
+-        buttons: ['Cancel', 'Quit'],
++        buttons: ['取消', '退出'],
+         defaultId: 1,
+         cancelId: 0,
+-        title: 'Confirm Quit',
+-        message: 'Are you sure you want to quit?',
+-        detail: 'There may be agents or background tasks running.',
++        title: '确认退出',
++        message: '确定要退出吗？',
++        detail: '可能有智能体或后台任务正在运行。',
+     };

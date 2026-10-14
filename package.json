@@ -1,0 +1,28 @@
+{
+  "name": "antigravity-zh-cn",
+  "version": "1.0.0",
+  "description": "Google Antigravity 桌面应用简体中文汉化补丁",
+  "keywords": [
+    "antigravity",
+    "google",
+    "chinese",
+    "localization",
+    "i18n",
+    "zh-cn",
+    "electron",
+    "patch"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "apply": "node tools/apply-patches.js",
+    "install-patch": "node tools/apply-patches.js && scripts/install.bat",
+    "restore": "scripts/restore.bat"
+  },
+  "dependencies": {
+    "@electron/asar": "^3.2.0"
+  }
+}

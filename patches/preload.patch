@@ -1,0 +1,21 @@
+--- preload.js
++++ preload.js
+@@ -10,6 +10,18 @@
+  */
+ const electron_1 = require("electron");
++// ── 简体中文翻译注入 ──
++const _zhFs = require("fs");
++const _zhPath = require("path");
++try {
++    require('./zh-cn-translate.js');
++} catch (_zhErr2) {
++    console.error('[zh-CN] Failed to require translation script:', _zhErr2.message);
++}
++try {
++    const _zhScript = _zhFs.readFileSync(_zhPath.join(__dirname, 'zh-cn-translate.js'), 'utf-8');
++    electron_1.webFrame.executeJavaScript(_zhScript).catch(() => {});
++} catch (_zhErr) {
++    console.error('[zh-CN] Failed to load translation script:', _zhErr.message);
++}
++// ── 简体中文翻译注入结束 ──
+ const updaterAPI = {

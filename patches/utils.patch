@@ -1,0 +1,25 @@
+--- utils.js
++++ utils.js
+@@ -100,6 +100,14 @@
+         win.webContents.on('did-finish-load', () => {
+             void applyStoredZoomLevel();
++            try {
++                const zhPath = path_1.default.join(__dirname, 'zh-cn-translate.js');
++                if (fs.existsSync(zhPath)) {
++                    const zhCode = fs.readFileSync(zhPath, 'utf-8');
++                    void win.webContents.executeJavaScript(zhCode);
++                }
++            } catch (err) {
++                console.error('[zh-CN] did-finish-load translation injection error:', err);
++            }
+         });
+         win.webContents.on('dom-ready', () => {
++            try {
++                const zhPath = path_1.default.join(__dirname, 'zh-cn-translate.js');
++                if (fs.existsSync(zhPath)) {
++                    const zhCode = fs.readFileSync(zhPath, 'utf-8');
++                    void win.webContents.executeJavaScript(zhCode);
++                }
++            } catch (err) {
++                console.error('[zh-CN] dom-ready translation injection error:', err);
++            }

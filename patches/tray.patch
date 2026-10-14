@@ -1,0 +1,10 @@
+--- tray.js
++++ tray.js
+@@ -87,5 +87,2 @@
+-            countItem.label =
+-                (count > 0 ? `${count}` : 'No') +
+-                    ' agent' +
+-                    (count === 1 ? '' : 's') +
+-                    ' running';
++            countItem.label =
++                (count > 0 ? `${count} 个智能体运行中` : '无智能体运行');
