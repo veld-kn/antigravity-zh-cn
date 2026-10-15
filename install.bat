@@ -1,4 +1,4 @@
 @echo off
-chcp 65001 >nul
-title Antigravity Chinese Localization Install
+setlocal
+cd /d "%~dp0"
 call "%~dp0一键安装汉化.bat"

@@ -1317,7 +1317,18 @@
   "Zoom in (+)": "放大 (+)",
   "Zoom out": "缩小",
   "Zoom Out": "缩小",
-  "Zoom out (-)": "缩小 (-)"
+  "Zoom out (-)": "缩小 (-)",
+  "Load older messages": "加载更早的消息",
+  "Good response": "满意回答",
+  "Bad response": "不满意回答",
+  "Copy code": "复制代码",
+  "Copied!": "已复制！",
+  "No active conversations": "暂无活动对话",
+  "No conversations yet": "暂无历史对话",
+  "Clear chat": "清空聊天",
+  "Clear history": "清空历史",
+  "Regenerate response": "重新生成回答",
+  "Retry": "重试"
 };
 
   // 大小写不敏感反向索引
@@ -1401,6 +1412,17 @@
     { pattern: /^a\s+day\s+ago$/i, replace: '1 天前' },
     { pattern: /^a\s+week\s+ago$/i, replace: '1 周前' },
     { pattern: /^a\s+month\s+ago$/i, replace: '1 个月前' },
+    { pattern: /^(\d+)\s*h\s*ago$/i, replace: '$1 小时前' },
+    { pattern: /^(\d+)\s*m\s*ago$/i, replace: '$1 分钟前' },
+    { pattern: /^(\d+)\s*s\s*ago$/i, replace: '$1 秒前' },
+    { pattern: /^(\d+)\s*d\s*ago$/i, replace: '$1 天前' },
+    { pattern: /^(\d+)\s*w\s*ago$/i, replace: '$1 周前' },
+    { pattern: /^(\d+)\s*mo\s*ago$/i, replace: '$1 个月前' },
+    { pattern: /^(\d+)\s*y\s*ago$/i, replace: '$1 年前' },
+    { pattern: /^(\d+)\s*h$/i, replace: '$1 小时前' },
+    { pattern: /^(\d+)\s*m$/i, replace: '$1 分钟前' },
+    { pattern: /^(\d+)\s*d$/i, replace: '$1 天前' },
+    { pattern: /^(\d+)\s*w$/i, replace: '$1 周前' },
     { pattern: /^Showing\s+(\d+)\s+of\s+(\d+)$/i, replace: '显示 $1 / $2' },
     { pattern: /^Step\s+(\d+)\s+of\s+(\d+)$/i, replace: '第 $1 步，共 $2 步' },
     { pattern: /^(\d+)\s+items?$/i, replace: '$1 项' },

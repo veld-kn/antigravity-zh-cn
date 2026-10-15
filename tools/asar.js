@@ -2678,8 +2678,16 @@ function readFileSync(filesystem, filename, info) {
     return Buffer.alloc(0);
   }
   if (info.unpacked) {
-    const unpackedDir = `${filesystem.getRootPath()}.unpacked`;
-    return wrappedFs.readFileSync(ensureWithin(unpackedDir, filename));
+    let unpackedDir = `${filesystem.getRootPath()}.unpacked`;
+    if (!wrappedFs.existsSync(unpackedDir)) {
+      const altDir = import_node_path3.default.join(import_node_path3.default.dirname(filesystem.getRootPath()), 'app.asar.unpacked');
+      if (wrappedFs.existsSync(altDir)) unpackedDir = altDir;
+    }
+    try {
+      return wrappedFs.readFileSync(ensureWithin(unpackedDir, filename));
+    } catch {
+      return Buffer.alloc(0);
+    }
   }
   const fd = wrappedFs.openSync(filesystem.getRootPath(), "r");
   try {
@@ -6003,7 +6011,16 @@ function extractAll(archivePath, dest) {
       try {
         let content;
         if (file.unpacked) {
-          content = wrappedFs.readFileSync(import_node_path6.default.join(`${filesystem.getRootPath()}.unpacked`, filename));
+          let unpackedDir = `${filesystem.getRootPath()}.unpacked`;
+          if (!wrappedFs.existsSync(unpackedDir)) {
+            const altDir = import_node_path6.default.join(import_node_path6.default.dirname(filesystem.getRootPath()), 'app.asar.unpacked');
+            if (wrappedFs.existsSync(altDir)) unpackedDir = altDir;
+          }
+          try {
+            content = wrappedFs.readFileSync(import_node_path6.default.join(unpackedDir, filename));
+          } catch {
+            content = Buffer.alloc(0);
+          }
         } else if (file.size <= 0) {
           content = Buffer.alloc(0);
         } else {
